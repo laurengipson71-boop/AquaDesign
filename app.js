@@ -1184,5 +1184,200 @@ function showToast(message) {
   );
 }
 
+// ===== AQUARIUM OBJECT DRAG FIX =====
+
+function enableAquariumDragging() {
+  const tank = document.querySelector(".tank-content");
+  if (!tank) return;
+
+  const objects = tank.querySelectorAll(
+    ".hardscape-piece, .aquatic-plant, .aquatic-animal, .tank-equipment"
+  );
+
+  objects.forEach((object) => {
+    const instanceId = object.dataset.instance;
+
+    if (!instanceId) return;
+
+    // Make absolutely sure the objects can receive mouse/pointer input
+    object.style.pointerEvents = "auto";
+    object.style.touchAction = "none";
+    object.style.cursor = "grab";
+    object.style.userSelect = "none";
+    object.style.webkitUserSelect = "none";
+
+    let dragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    object.onpointerdown = function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      dragging = true;
+      object.style.cursor = "grabbing";
+      object.classList.add("is-selected");
+
+      state.selectedInstance = instanceId;
+
+      tank.querySelectorAll(".is-selected").forEach((other) => {
+        if (other !== object) {
+          other.classList.remove("is-selected");
+        }
+      });
+
+      const tankRect = tank.getBoundingClientRect();
+      const objectRect = object.getBoundingClientRect();
+
+      offsetX = event.clientX - objectRect.left;
+      offsetY = event.clientY - objectRect.top;
+
+      try {
+        object.setPointerCapture(event.pointerId);
+      } catch (e) {}
+
+      function moveObject(moveEvent) {
+        if (!dragging) return;
+
+        moveEvent.preventDefault();
+        moveEvent.stopPropagation();
+
+        const tankRect = tank.getBoundingClientRect();
+
+        let newLeft =
+          moveEvent.clientX -
+          tankRect.left -
+          offsetX;
+
+        let newTop =
+          moveEvent.clientY -
+          tankRect.top -
+          offsetY;
+
+        const objectWidth = object.offsetWidth;
+        const objectHeight = object.offsetHeight;
+
+        // Keep the object inside the aquarium
+        newLeft = Math.max(
+          0,
+          Math.min(
+            tankRect.width - objectWidth,
+            newLeft
+          )
+        );
+
+        newTop = Math.max(
+          0,
+          Math.min(
+            tankRect.height - objectHeight,
+            newTop
+          )
+        );
+
+        const leftPercent =
+          (newLeft / tankRect.width) * 100;
+
+        const topPercent =
+          (newTop / tankRect.height) * 100;
+
+        object.style.left = leftPercent + "%";
+        object.style.top = topPercent + "%";
+        object.style.right = "auto";
+        object.style.bottom = "auto";
+
+        state.positions[instanceId] = {
+          left: leftPercent,
+          top: topPercent
+        };
+      }
+
+      function stopObject(stopEvent) {
+        dragging = false;
+
+        object.style.cursor = "grab";
+
+        document.removeEventListener(
+          "pointermove",
+          moveObject
+        );
+
+        document.removeEventListener(
+          "pointerup",
+          stopObject
+        );
+
+        document.removeEventListener(
+          "pointercancel",
+          stopObject
+        );
+
+        try {
+          object.releasePointerCapture(stopEvent.pointerId);
+        } catch (e) {}
+      }
+
+      document.addEventListener(
+        "pointermove",
+        moveObject,
+        { passive: false }
+      );
+
+      document.addEventListener(
+        "pointerup",
+        stopObject,
+        { passive: false }
+      );
+
+      document.addEventListener(
+        "pointercancel",
+        stopObject,
+        { passive: false }
+      );
+    };
+  });
+}
+
+
+// Re-run dragging every time the aquarium is redrawn
+const aquariumOriginalRenderPreview = renderPreview;
+
+renderPreview = function () {
+  aquariumOriginalRenderPreview();
+
+  setTimeout(() => {
+    enableAquariumDragging();
+  }, 0);
+};
+
+
+// Make the aquarium objects clickable even if CSS was preventing it
+const aquariumDragStyle = document.createElement("style");
+
+aquariumDragStyle.textContent = `
+  .tank-content .hardscape-piece,
+  .tank-content .aquatic-plant,
+  .tank-content .aquatic-animal,
+  .tank-content .tank-equipment {
+    pointer-events: auto !important;
+    touch-action: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    cursor: grab !important;
+  }
+
+  .tank-content .hardscape-piece.is-selected,
+  .tank-content .aquatic-plant.is-selected,
+  .tank-content .aquatic-animal.is-selected,
+  .tank-content .tank-equipment.is-selected {
+    cursor: grabbing !important;
+    filter: drop-shadow(0 0 8px rgba(255,255,255,.8));
+  }
+`;
+
+document.head.appendChild(aquariumDragStyle);
+
+
+// Start everything
+render();
 render();
 ```
