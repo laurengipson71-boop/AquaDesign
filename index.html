@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Design a complete aquarium with Aquarium Designer." />
+  <title>Aquarium Designer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="Aquarium Designer home"><span class="brand-mark"><i data-lucide="waves"></i></span><span>Aquarium<span class="brand-accent">Designer</span></span></a>
+    <div class="topbar-actions"><span class="save-status"><span class="status-dot"></span>Auto-saved</span><button class="icon-button" type="button" title="Share design" aria-label="Share design"><i data-lucide="share-2"></i></button><button class="outline-button" type="button" id="reset-button"><i data-lucide="rotate-ccw"></i>Reset</button></div>
+  </header>
+  <main id="top" class="app-layout">
+    <section class="builder-panel" aria-labelledby="builder-title">
+      <div class="intro"><p class="eyebrow">Your aquatic workspace</p><h1 id="builder-title">Build a world<br /><em>worth diving into.</em></h1><p class="intro-copy">Choose the essentials for your tank. Your setup will take shape as you go.</p></div>
+      <nav class="category-nav" aria-label="Aquarium components" id="category-nav"></nav>
+      <div class="catalog-heading"><div><p class="eyebrow" id="category-kicker">Aquatic Animals</p><h2 id="category-title">Choose your inhabitants</h2></div><span class="item-count" id="item-count"></span></div>
+      <div class="catalog-grid" id="catalog-grid"></div>
+    </section>
+    <aside class="preview-panel" aria-labelledby="preview-title">
+      <div class="preview-header"><div><p class="eyebrow">Live preview</p><h2 id="preview-title">Your aquarium</h2></div><button class="icon-button light" type="button" title="Expand preview" aria-label="Expand preview"><i data-lucide="maximize-2"></i></button></div>
+      <div class="tank-scene" role="img" aria-label="Aquarium preview with a planted freshwater scene"><div class="scene-label"><span class="pulse"></span><span>Freshwater / Planted</span></div><div class="tank-specs"><strong id="tank-size-label">Choose a size</strong><span id="tank-capacity">Capacity pending</span></div><div class="tank-overlay"></div><div class="tank-content"></div><div class="tank-glass-line"></div></div>
+      <div class="preview-footer"><div class="setup-name"><span class="mini-icon"><i data-lucide="droplets"></i></span><div><strong id="setup-name">Untitled setup</strong><small id="setup-subtitle">A blank canvas for your next idea</small></div></div><button class="primary-button" type="button" id="save-button"><i data-lucide="bookmark"></i>Save design</button></div>
+      <div class="selected-section"><div class="selected-heading"><h3>Selected components</h3><span id="selected-count">0 items</span></div><div class="selected-list" id="selected-list"><p class="empty-state"><i data-lucide="sparkles"></i>Start with an item from the catalog.</p></div></div>
+    </aside>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
